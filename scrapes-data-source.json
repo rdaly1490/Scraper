@@ -1,0 +1,16 @@
+[
+  {
+    "url": "https://www.officedepot.com/catalog/search.do?Ntt=lysol+wipes",
+    "target": ".products.searchV2.v3_buttons",
+    "rules": [
+      {
+        "child": ".desc_text .med_txt black",
+        "regex": ""
+      },
+      {
+        "child": "oos_label",
+        "existence": true
+      }
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "name": "scraper",
+  "version": "1.0.0",
+  "description": "Scrape all the things",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "start-dev": "nodemon",
+    "start-debug": "node --inspect main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rdaly1490/Scraper.git"
+  },
+  "author": "Rob Daly",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rdaly1490/Scraper/issues"
+  },
+  "homepage": "https://github.com/rdaly1490/Scraper#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "pug": "^2.0.4",
+    "puppeteer": "^2.1.1"
+  }
+}
