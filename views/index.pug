@@ -3,3 +3,8 @@ html
     title Scraper
   body
     h1= status
+    button(onclick='startScrape()') Start Scrape
+    script.
+      var startScrape = function() {
+        fetch("/start-scrape");
+      }

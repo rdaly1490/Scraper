@@ -4,7 +4,7 @@ const Scraper = require("./scraper");
 
 class MasterControlProgram {
   constructor(options) {
-    this._httpServer = new HttpServer();
+    this._httpServer = new HttpServer({ mcp: this });
     this.twilio = new Twilio();
     this.scraper = new Scraper(options);
 
@@ -15,6 +15,9 @@ class MasterControlProgram {
 
   start = () => {
     this._httpServer.startServer();
+  };
+
+  startScrape = () => {
     this.scraper.startScraping();
   };
 

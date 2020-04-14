@@ -1,14 +1,16 @@
 [
   {
-    "url": "https://www.officedepot.com/catalog/search.do?Ntt=lysol+wipes",
+    "site": "Office Depot",
+    "url": "https://www.officedepot.com/catalog/search.do?Ntt=lysol",
     "target": ".products.searchV2.v3_buttons",
+    "itemDescriptionTarget": ".desc_text .med_txt",
     "rules": [
       {
-        "child": ".desc_text .med_txt black",
-        "regex": ""
+        "child": ".desc_text .med_txt",
+        "regex": "/lysol/gi"
       },
       {
-        "child": "oos_label",
+        "child": ".oos_label",
         "existence": true
       }
     ]

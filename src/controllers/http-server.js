@@ -4,7 +4,7 @@ const { PORT } = require("../constants");
 const { ServerStatus } = require("../enums");
 
 class HttpServer {
-  constructor() {
+  constructor(deps) {
     this.app = express();
     this.port = PORT;
     this.status = ServerStatus.stopped;
@@ -12,6 +12,8 @@ class HttpServer {
     this.app.set("view engine", "pug");
 
     this.registerRoutes();
+
+    Object.assign(this, deps);
   }
 
   startServer = () => {
@@ -25,6 +27,9 @@ class HttpServer {
     this.app.get("/", (req, res) =>
       res.render("index", { status: ServerStatus.description(this.status) })
     );
+    this.app.get("/start-scrape", (req, res) => {
+      this.mcp.startScrape();
+    });
   };
 
   stopServer = () => {
