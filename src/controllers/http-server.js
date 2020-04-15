@@ -30,6 +30,9 @@ class HttpServer {
     this.app.get("/start-scrape", (req, res) => {
       this.mcp.startScrape();
     });
+    this.app.get("/refresh-page-data", (req, res) => {
+      res.send(this.mcp.pageData);
+    });
   };
 
   stopServer = () => {

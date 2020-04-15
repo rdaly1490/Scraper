@@ -4,7 +4,10 @@ html
   body
     h1= status
     button(onclick='startScrape()') Start Scrape
+    h1 Last 3 In Stock Alerts Go Here
+    h1 Scrape Errors Go Here
+    h1 General App Errors Go Here
     script.
-      var startScrape = function() {
+      const startScrape = () => {
         fetch("/start-scrape");
       }

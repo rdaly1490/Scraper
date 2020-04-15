@@ -1,14 +1,19 @@
 const ScraperBaseClass = require("../common/scraper-base-class");
 
-class Twilio extends ScraperBaseClass {
-  constructor(twilioConfig) {
-    super();
-    if (twilioConfig) {
-      this.keys = twilioConfig;
+class Twilio {
+  constructor(deps) {
+    if (deps.twilioConfig) {
+      this.keys = deps.twilioConfig;
     } else {
-      this.errorHandler.throwMissingConfigError();
+      // add config error
     }
+
+    Object.assign(this, deps);
   }
+
+  sendTextForResult = result => {
+    console.log(result);
+  };
 }
 
 module.exports = Twilio;

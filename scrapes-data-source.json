@@ -7,7 +7,10 @@
     "rules": [
       {
         "child": ".desc_text .med_txt",
-        "regex": "/lysol/gi"
+        "regex": {
+          "pattern": "lysol.*wipes",
+          "flags": "gi"
+        }
       },
       {
         "child": ".oos_label",

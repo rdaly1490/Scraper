@@ -1,140 +1,113 @@
 const puppeteer = require("puppeteer");
 const ScraperBaseClass = require("../common/scraper-base-class");
+const { compactMap } = require("../common/helpers");
 
-class Scraper extends ScraperBaseClass {
-  constructor(config) {
-    super();
-
-    this.poller = null;
+class Scraper {
+  constructor(deps) {
     this.scrapeAll = this.scrapeAll.bind(this);
     this.scrapePage = this.scrapePage.bind(this);
     this.startScraping = this.startScraping.bind(this);
 
-    Object.assign(this, config);
+    Object.assign(this, deps);
   }
 
   async startScraping() {
-    // const { POLLING_INTERVAL } = this.config;
     console.log("start scraping");
+    this.errorHandler.clearErrors();
     await this.scrapeAll();
     console.log("done scraping");
-    // this.poller = setInterval(this.scrapeAll, POLLING_INTERVAL);
   }
 
   async scrapeAll() {
     const scrapeCandidates = this.scrapeDataSource;
-    const browser = await puppeteer.launch();
+    let browser;
+    if (process.env.NODE_ENV === "production") {
+      browser = await puppeteer.launch();
+    } else {
+      browser = await puppeteer.launch({ devtools: true });
+    }
 
     for (const candidate of scrapeCandidates) {
       const result = await this.scrapePage(candidate, browser);
-      if (result) {
+      if (result.length) {
+        // use mcp to add to result set
         console.log("succeess");
-      } else {
-        console.log("none in stock");
       }
     }
   }
 
-  checkRegexRule = (rule, child) => {
-    const flags = rule.regex.replace(/.*\/([gimy]*)$/, "$1");
-    const pattern = rule.regex.replace(
-      new RegExp("^/(.*?)/" + flags + "$"),
-      "$1"
-    );
-    var regex = new RegExp(pattern, flags);
-    const matchesRegex = regex.test(child.innerHtml);
-    return matchesRegex;
-  };
-
-  evaluateTargetVerusRules = (child, rules) => {
-    let isValid = [];
-    for (const rule of _candidate.rules) {
-      const child = target.querySlector(rule.child);
-      if (!child) {
-        // one rule fails so all fail
-        // Print error info
-        return true;
-      }
-
-      if (rule.hasOwnProperty("regex")) {
-        const matchesRegex = this.checkRegexRule(rule, child);
-        isValid.push(true);
-        // isValid.push(matchesRegex);
-      } else if (rule.hasOwnProperty("existence")) {
-        isValid.push(true);
-        // if (rule.existence) {
-        //   isValid.push(!!child);
-        // } else {
-        //   isValid.push(!child);
-        // }
-      } else {
-        isValid.push(false);
-      }
-    }
-    return isValid.length === 0;
-  };
-
   async scrapePage(candidate, browser) {
-    const that = this;
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(120000);
+    await page.exposeFunction("logError", this.errorHandler.addScrapeError);
     await page.goto(candidate.url);
 
-    const matches = await page.evaluate(_candidate => {
-      const checkRegexRule = (rule, child) => {
-        const flags = rule.regex.replace(/.*\/([gimy]*)$/, "$1");
-        const pattern = rule.regex.replace(
-          new RegExp("^/(.*?)/" + flags + "$"),
-          "$1"
-        );
-        var regex = new RegExp(rule.regex);
-        const matchesRegex = regex.test(child.text);
-        return matchesRegex;
-      };
+    const matches = await page.evaluate(this.puppeteerEvaluatePage, candidate);
 
-      const evaluateTargetVerusRules = (target, rules) => {
-        let isValid = [];
-        for (let rule of rules) {
-          const child = target.querySelector(rule.child);
-          if (!child) {
-            // one rule fails so all fail
-            // Print error info
-            return false;
-          }
-          if (rule.hasOwnProperty("regex")) {
+    console.log(matches);
+
+    return matches;
+  }
+
+  puppeteerEvaluatePage = candidate => {
+    const checkRegexRule = (rule, child) => {
+      var regex = new RegExp(rule.regex.pattern, rule.regex.flags);
+      const matchesRegex = regex.test(child.text);
+      return matchesRegex;
+    };
+
+    const evaluateTargetVersusRules = (target, candidate) => {
+      let isValid = [];
+      const { rules } = candidate;
+      rules.forEach((rule, index) => {
+        const child = target.querySelector(rule.child);
+        if (rule.hasOwnProperty("regex")) {
+          if (child) {
             const matchesRegex = checkRegexRule(rule, child);
             isValid.push(matchesRegex);
-          } else if (rule.hasOwnProperty("existence")) {
-            if (rule.existence) {
-              isValid.push(!!child);
-            } else {
-              isValid.push(!child);
-            }
           } else {
-            // invalid rule type
-            // Print error info
-            return false;
+            window.logError(
+              `Couldn't find child for rule number ${index}`,
+              candidate
+            );
           }
+        } else if (rule.hasOwnProperty("existence")) {
+          if (rule.existence) {
+            isValid.push(!!child);
+          } else {
+            isValid.push(!child);
+          }
+        } else {
+          window.logError(
+            `Invalid rule type for rule number ${index}`,
+            candidate
+          );
+          return false;
         }
-        return isValid.length && isValid.every(t => t);
-      };
+      });
 
-      const targets = Array.from(document.querySelectorAll(_candidate.target));
+      return isValid.length && isValid.every(t => t);
+    };
 
-      return targets.map(target => {
-        const isValid = evaluateTargetVerusRules(target, _candidate.rules);
+    const targets = Array.from(document.querySelectorAll(candidate.target));
+    return targets
+      .map(target => {
+        const isValid = evaluateTargetVersusRules(target, candidate);
         if (isValid) {
-          const result = target.querySelector(_candidate.itemDescriptionTarget);
+          const result = target.querySelector(candidate.itemDescriptionTarget);
           if (result) {
-            return { site: _candidate.site, text: result.text };
+            return { site: candidate.site, text: result.text };
+          } else {
+            window.logError(
+              "Success for rules, but couldn't find 'itemDescriptionTarget'",
+              candidate
+            );
           }
         }
         return null;
-      });
-    }, candidate);
-
-    console.log(matches);
-  }
+      })
+      .filter(x => x);
+  };
 }
 
 module.exports = Scraper;
