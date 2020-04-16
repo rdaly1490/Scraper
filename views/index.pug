@@ -1,13 +1,24 @@
 html
   head
     title Scraper
+    style
+      include css/toggle-button.css
+      include css/app.css
   body
-    h1= status
-    button(onclick='startScrape()') Start Scrape
-    h1 Last 3 In Stock Alerts Go Here
-    h1 Scrape Errors Go Here
-    h1 General App Errors Go Here
-    script.
-      const startScrape = () => {
-        fetch("/start-scrape");
-      }
+    h1 The server is #{status.toLowerCase()}
+    div(class='toggle-btn-container')
+      h3 Scrape Sites
+      div(class=isScraping ? 'toggle-btn active' : 'toggle-btn')
+        input(class='cb-value', type='checkbox', checked=isScraping)
+        span(class='round-btn')
+    h3 Last 3 In Stock Alerts
+    div(class='in-stock-alerts list')
+    h3 Scrape Errors Go Here
+    div(class='scrape-errors list')
+    h3 General App Errors Go Here
+    div(class='app-errors list')
+    h3 Logs
+    div(class='logs list')
+
+    script(src='/socket.io/socket.io.js')
+    script(src='js/app.js')

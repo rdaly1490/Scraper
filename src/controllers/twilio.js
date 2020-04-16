@@ -3,7 +3,7 @@ const ScraperBaseClass = require("../common/scraper-base-class");
 class Twilio {
   constructor(deps) {
     if (deps.twilioConfig) {
-      this.keys = deps.twilioConfig;
+      this.keys = deps.mcp.config.twilioConfig;
     } else {
       // add config error
     }

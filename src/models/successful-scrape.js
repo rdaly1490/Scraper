@@ -1,7 +1,8 @@
 class SuccessfulScrape {
-  constructor(site, itemDescription) {
+  constructor(site, url, text) {
     this.site = site;
-    this.itemDescription = itemDescription;
+    this.url = url;
+    this.text = text;
   }
 }
 

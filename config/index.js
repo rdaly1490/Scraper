@@ -1,5 +1,6 @@
 module.exports = (() => {
-  const POLLING_INTERVAL = 5000;
+  const SCRAPE_DELAY = 5000;
+  const DATE_FORMAT = "MMM D - h:m A";
   if (process.env.NODE_ENV === "production") {
     return {
       twilio: {
@@ -8,13 +9,15 @@ module.exports = (() => {
         ACCOUNT_SID: process.env.ACCOUNT_SID,
         AUTH_TOKEN: process.env.AUTH_TOKEN
       },
-      POLLING_INTERVAL: process.env.POLLING_INTERVAL || POLLING_INTERVAL
+      SCRAPE_DELAY: process.env.SCRAPE_DELAY || SCRAPE_DELAY,
+      DATE_FORMAT: process.env.DATE_FORMAT || DATE_FORMAT
     };
   } else {
     const keys = require("./keys");
     return {
       twilio: keys.twilio,
-      POLLING_INTERVAL
+      SCRAPE_DELAY,
+      DATE_FORMAT
     };
   }
 })();

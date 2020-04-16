@@ -1,6 +1,7 @@
 const puppeteer = require("puppeteer");
 const ScraperBaseClass = require("../common/scraper-base-class");
 const { compactMap } = require("../common/helpers");
+const { SuccessfulScrape } = require("../models/successful-scrape");
 
 class Scraper {
   constructor(deps) {
@@ -12,14 +13,14 @@ class Scraper {
   }
 
   async startScraping() {
-    console.log("start scraping");
-    this.errorHandler.clearErrors();
+    this.mcp.log("Scraping process started");
+
+    this.mcp.clearErrors();
     await this.scrapeAll();
-    console.log("done scraping");
   }
 
   async scrapeAll() {
-    const scrapeCandidates = this.scrapeDataSource;
+    const scrapeCandidates = this.mcp.scrapeDataSource;
     let browser;
     if (process.env.NODE_ENV === "production") {
       browser = await puppeteer.launch();
@@ -27,25 +28,36 @@ class Scraper {
       browser = await puppeteer.launch({ devtools: true });
     }
 
+    let successfulScrapes = [];
     for (const candidate of scrapeCandidates) {
-      const result = await this.scrapePage(candidate, browser);
-      if (result.length) {
-        // use mcp to add to result set
-        console.log("succeess");
+      const results = await this.scrapePage(candidate, browser);
+      if (results.length) {
+        successfulScrapes = [...successfulScrapes, ...results];
       }
     }
+
+    this.mcp.addResults(successfulScrapes);
+
+    this.mcp.log(
+      `Current scrape process finished with ${successfulScrapes.length} successful scrapes`
+    );
+
+    setTimeout(() => {
+      if (this.mcp.isScraping) {
+        this.scrapeAll();
+      } else {
+        this.mcp.log("Scraping has stopped");
+      }
+    }, this.mcp.config.SCRAPE_DELAY || 0);
   }
 
   async scrapePage(candidate, browser) {
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(120000);
-    await page.exposeFunction("logError", this.errorHandler.addScrapeError);
+    await page.exposeFunction("logError", this.mcp.addScrapeError);
     await page.goto(candidate.url);
 
     const matches = await page.evaluate(this.puppeteerEvaluatePage, candidate);
-
-    console.log(matches);
-
     return matches;
   }
 
@@ -90,13 +102,18 @@ class Scraper {
     };
 
     const targets = Array.from(document.querySelectorAll(candidate.target));
+    window.logError("Test", candidate);
     return targets
       .map(target => {
         const isValid = evaluateTargetVersusRules(target, candidate);
         if (isValid) {
           const result = target.querySelector(candidate.itemDescriptionTarget);
           if (result) {
-            return { site: candidate.site, text: result.text };
+            return new SuccessfulScrape(
+              candidate.site,
+              candidate.url,
+              result.text
+            );
           } else {
             window.logError(
               "Success for rules, but couldn't find 'itemDescriptionTarget'",

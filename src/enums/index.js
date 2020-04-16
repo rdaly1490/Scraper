@@ -12,4 +12,21 @@ const ServerStatus = {
   }
 };
 
-module.exports = { ServerStatus };
+const ErrorTypes = {
+  scrape: 0,
+  config: 1,
+  generic: 2
+};
+
+const SocketEventTypes = {
+  log: "log",
+  scrapeError: "scrape error",
+  appError: "app error",
+  toggleScrape: "toggle scrape"
+};
+
+module.exports = {
+  ServerStatus,
+  ErrorTypes,
+  SocketEventTypes
+};

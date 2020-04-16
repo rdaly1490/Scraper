@@ -1,26 +1,10 @@
-const ErrorTypes = {
-  scrape: 0,
-  config: 1
-};
-
-class ScrapeError {
-  constructor(text, candidate) {
-    this.text = text;
-    this.date = new Date();
-    this.candidate = candidate;
-    this.errorType = ErrorTypes.scrape;
-  }
-}
+const { ErrorTypes } = require("../enums");
+const { GenericError, ScrapeError, ConfigError } = require("../models/error");
 
 class ErrorHandler {
   constructor() {
     this.errors = [];
   }
-
-  addScrapeError = (text, candidate) => {
-    const error = new ScrapeError(text, candidate);
-    this.addError(error);
-  };
 
   clearErrors = () => {
     this.errors = [];
