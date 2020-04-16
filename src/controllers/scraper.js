@@ -22,10 +22,10 @@ class Scraper {
   async scrapeAll() {
     const scrapeCandidates = this.mcp.scrapeDataSource;
     let browser;
-    if (process.env.NODE_ENV === "production") {
-      browser = await puppeteer.launch();
-    } else {
+    if (process.env.NODE_ENV === "debug") {
       browser = await puppeteer.launch({ devtools: true });
+    } else {
+      browser = await puppeteer.launch();
     }
 
     let successfulScrapes = [];
