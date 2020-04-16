@@ -30,6 +30,7 @@ class Scraper {
 
     let successfulScrapes = [];
     for (const candidate of scrapeCandidates) {
+      this.mcp.log(`Scraping ${candidate.site}`);
       const results = await this.scrapePage(candidate, browser);
       if (results.length) {
         successfulScrapes = [...successfulScrapes, ...results];
@@ -58,7 +59,9 @@ class Scraper {
     await page.goto(candidate.url);
 
     const matches = await page.evaluate(this.puppeteerEvaluatePage, candidate);
-    return matches;
+    return matches.map(match => {
+      return new SuccessfulScrape(match.site, match.url, match.text);
+    });
   }
 
   puppeteerEvaluatePage = candidate => {
@@ -109,11 +112,11 @@ class Scraper {
         if (isValid) {
           const result = target.querySelector(candidate.itemDescriptionTarget);
           if (result) {
-            return new SuccessfulScrape(
-              candidate.site,
-              candidate.url,
-              result.text
-            );
+            return {
+              site: candidate.site,
+              url: candidate.url,
+              text: result.text
+            };
           } else {
             window.logError(
               "Success for rules, but couldn't find 'itemDescriptionTarget'",

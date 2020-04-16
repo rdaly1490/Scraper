@@ -6,4 +6,4 @@ class SuccessfulScrape {
   }
 }
 
-module.exports = SuccessfulScrape;
+module.exports = { SuccessfulScrape };

@@ -6,7 +6,6 @@ const ErrorHandler = require("./errors");
 
 const { ErrorTypes, SocketEventTypes } = require("../enums");
 const { GenericError, ScrapeError, ConfigError } = require("../models/error");
-const { SuccessfulScrape } = require("../models/successful-scrape");
 
 class MasterControlProgram {
   constructor(options) {
@@ -76,7 +75,7 @@ class MasterControlProgram {
   };
 
   addResults = results => {
-    const _results = results.filter(isValidResult);
+    const _results = results.filter(this.isValidResult);
     if (_results.length) {
       // TODO: call twilio and have remove after successful text was sent
       this.results.concat(_results);
