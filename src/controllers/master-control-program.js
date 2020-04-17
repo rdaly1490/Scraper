@@ -6,11 +6,12 @@ const ErrorHandler = require("./errors");
 
 const { ErrorTypes, SocketEventTypes } = require("../enums");
 const { GenericError, ScrapeError, ConfigError } = require("../models/error");
+const { MAX_ERRORS_PER_SITE } = require("../constants");
 
 class MasterControlProgram {
   constructor(options) {
     const mcp = { mcp: this };
-    this.errorHandler = new ErrorHandler();
+    this.errorHandler = new ErrorHandler(mcp);
     this._httpServer = new HttpServer(mcp);
     this.twilio = new Twilio(mcp);
     this.scraper = new Scraper(mcp);
@@ -25,14 +26,27 @@ class MasterControlProgram {
     this._httpServer.startServer();
   };
 
+  setScraping = status => {
+    this.isScraping = status;
+    this.emitEvent(SocketEventTypes.toggleScrape, status);
+  };
+
   startScrape = () => {
-    this.isScraping = true;
+    this.setScraping(true);
     this.scraper.startScraping();
   };
 
+  resetAppState = () => {
+    this.setScraping(false);
+    this.clearData();
+  };
+
   endScrape = () => {
-    this.isScraping = false;
+    this.setScraping(false);
     this.log("Scraping process will end after the current scrape finishes");
+  };
+
+  clearData = () => {
     this.errorHandler.clearErrors();
     this.clearResults();
   };
@@ -61,14 +75,11 @@ class MasterControlProgram {
   };
 
   addError = error => {
-    let socketEventType = SocketEventTypes.appError;
-    const formattedDate = moment(error.date).format(this.config.DATE_FORMAT);
-    let message = `${formattedDate}: ${error.text}`;
-
-    if (error.errorType === ErrorTypes.scrape) {
-      socketEventType = SocketEventTypes.scrapeError;
-      message = `${message} ( ${error.candidate.site} )`;
-    }
+    const message = this.errorHandler.formatErrorMessage(error);
+    const socketEventType =
+      error.errorType === ErrorTypes.scrape
+        ? SocketEventTypes.scrapeError
+        : SocketEventTypes.appError;
 
     this.errorHandler.addError(error);
     this._httpServer.emitSocketEvent(socketEventType, message);
@@ -91,11 +102,45 @@ class MasterControlProgram {
     return isUnique;
   };
 
+  emitEvent = (socketEventType, message) => {
+    this._httpServer.emitSocketEvent(socketEventType, message);
+  };
+
   log = message => {
     const socketEventType = SocketEventTypes.log;
     console.log(`${socketEventType}: ${message}`);
-    this._httpServer.emitSocketEvent(socketEventType, message);
+    this.emitEvent(socketEventType, message);
   };
+
+  get scrapeSitesGroupedByStatus() {
+    const { scrapeErrors } = this.errorHandler;
+
+    const errorsGrouped = scrapeErrors.reduce((acc, error) => {
+      if (acc.hasOwnProperty(error.candidate.site)) {
+        acc[error.candidate.site] = acc[error.candidate.site] + 1;
+      } else {
+        acc[error.candidate.site] = 0;
+      }
+      return acc;
+    }, {});
+
+    const sitesGrouped = this.scrapeDataSource.reduce(
+      (acc, { site }) => {
+        if (
+          errorsGrouped[site] <= MAX_ERRORS_PER_SITE ||
+          !errorsGrouped.hasOwnProperty(site)
+        ) {
+          acc.functioningSites.push(site);
+        } else {
+          acc.errorSites.push(site);
+        }
+        return acc;
+      },
+      { errorSites: [], functioningSites: [] }
+    );
+
+    return sitesGrouped;
+  }
 }
 
 module.exports = MasterControlProgram;

@@ -22,7 +22,8 @@ const SocketEventTypes = {
   log: "log",
   scrapeError: "scrape error",
   appError: "app error",
-  toggleScrape: "toggle scrape"
+  toggleScrape: "toggle scrape",
+  siteStatuses: "site statuses"
 };
 
 module.exports = {

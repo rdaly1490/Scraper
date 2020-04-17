@@ -6,6 +6,14 @@ const logs = document.querySelector(".logs");
 const inStockAlerts = document.querySelector("in-stock-alerts");
 
 document.querySelector("input.cb-value").addEventListener("click", function() {
+  const functioningSites = document.querySelector(".functioning-sites");
+  const numFunctioningSites = functioningSites.childElementCount;
+  if (numFunctioningSites === 0) {
+    alert(
+      "The app can't find any valid candidates in your provided json list, please update the list or forcefully reset the app state using the clear state button"
+    );
+    return;
+  }
   const toggleBtn = document.querySelector(".toggle-btn");
   const isChecked = document.querySelector("input.cb-value").checked;
 
@@ -21,7 +29,7 @@ document.querySelector("input.cb-value").addEventListener("click", function() {
 socket.on("log", message => {
   console.log(message);
   const p = document.createElement("p");
-  p.innerHTML = message;
+  const _message = (p.innerHTML = JSON.stringify(message).slice(1, -1));
   logs.insertBefore(p, logs.firstChild);
 });
 
@@ -39,6 +47,43 @@ socket.on("app error", message => {
   appErrors.insertBefore(p, appErrors.firstChild);
 });
 
-const startScrape = () => {
-  fetch("/start-scrape");
-};
+socket.on("site statuses", ({ errorSites, functioningSites }) => {
+  const container = document.querySelector(".site-statuses");
+  const functioningSitesDiv = document.querySelector(".functioning-sites");
+  const errorSitesDiv = document.querySelector(".error-sites");
+
+  functioningSitesDiv.innerHTML = "";
+  errorSitesDiv.innerHTML = "";
+
+  const goodStatusSpan = document.createElement("span");
+  goodStatusSpan.innerHTML = "Good";
+  functioningSites.forEach(site => {
+    const div = document.createElement("div");
+    const siteSpan = document.createElement("span");
+    siteSpan.innerHTML = site + ":";
+    div.appendChild(siteSpan);
+    div.appendChild(goodStatusSpan);
+    functioningSitesDiv.appendChild(div);
+  });
+
+  const errorStatusSpan = document.createElement("span");
+  errorStatusSpan.innerHTML = "Error";
+  errorSites.forEach(site => {
+    const div = document.createElement("div");
+    const siteSpan = document.createElement("span");
+    siteSpan.innerHTML = site + ":";
+    div.appendChild(siteSpan);
+    div.appendChild(errorStatusSpan);
+    errorSitesDiv.appendChild(div);
+  });
+});
+
+socket.on("toggle scrape", toggleOn => {
+  const toggleBtn = document.querySelector(".toggle-btn");
+  const isChecked = document.querySelector("input.cb-value").checked;
+  if (toggleOn && !isChecked) {
+    toggleBtn.classList.add("active");
+  } else if (!toggleOn && isChecked) {
+    toggleBtn.classList.remove("active");
+  }
+});

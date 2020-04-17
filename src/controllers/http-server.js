@@ -40,14 +40,36 @@ class HttpServer {
     this.startServer();
   };
 
+  get siteData() {
+    const {
+      errorSites,
+      functioningSites
+    } = this.mcp.scrapeSitesGroupedByStatus;
+    const serverStatus = ServerStatus.description(this.status);
+    const isScraping = this.mcp.isScraping;
+    const scrapeErrors = this.mcp.errorHandler.scrapeErrors
+      .map(this.mcp.errorHandler.formatErrorMessage)
+      .sort((a, b) => b.date - a.date);
+    const appErrors = this.mcp.errorHandler.appErrors
+      .map(this.mcp.errorHandler.formatErrorMessage)
+      .sort((a, b) => b.date - a.date);
+
+    return {
+      errorSites,
+      functioningSites,
+      serverStatus,
+      isScraping,
+      scrapeErrors,
+      appErrors
+    };
+  }
+
   registerRoutes = () => {
-    //TODO: load any existing errors or results on page load
-    this.app.get("/", (req, res) =>
-      res.render("index", {
-        status: ServerStatus.description(this.status),
-        isScraping: this.mcp.isScraping
-      })
-    );
+    //TODO: load any existing errors or results from mcp state
+    this.app.get("/", (req, res) => {
+      console.log(this.siteData);
+      return res.render("index", this.siteData);
+    });
   };
 
   emitSocketEvent = (name, message) => {

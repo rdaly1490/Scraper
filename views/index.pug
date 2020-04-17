@@ -5,20 +5,37 @@ html
       include css/toggle-button.css
       include css/app.css
   body
-    h1 The server is #{status.toLowerCase()}
-    div(class='toggle-btn-container')
-      h3 Scrape Sites
-      div(class=isScraping ? 'toggle-btn active' : 'toggle-btn')
-        input(class='cb-value', type='checkbox', checked=isScraping)
-        span(class='round-btn')
-    h3 Last 3 In Stock Alerts
-    div(class='in-stock-alerts list')
-    h3 Scrape Errors Go Here
-    div(class='scrape-errors list')
-    h3 General App Errors Go Here
-    div(class='app-errors list')
-    h3 Logs
-    div(class='logs list')
+    div(class='app-container')
+      h1 The server is #{serverStatus.toLowerCase()}
+      div(class='toggle-btn-container')
+        h3 Scrape Sites
+        div(class=isScraping ? 'toggle-btn active' : 'toggle-btn')
+          input(class='cb-value', type='checkbox', checked=isScraping)
+          span(class='round-btn')
+      h4 Site Statuses
+      div(class='site-statuses')
+        div(class='functioning-sites')
+          each val in functioningSites
+            div
+              span=val + ':'
+              span Good
+        div(class='error-sites')
+          each val in errorSites
+            div
+              span=val + ':'
+              span Error
+      h3 Last 3 In Stock Alerts
+      div(class='in-stock-alerts list')
+      h3 Scrape Errors Go Here
+      div(class='scrape-errors list')
+        each val in scrapeErrors
+          p=val
+      h3 General App Errors Go Here
+        each val in appErrors
+          p=val
+      div(class='app-errors list')
+      h3 Logs
+      div(class='logs list')
 
     script(src='/socket.io/socket.io.js')
     script(src='js/app.js')

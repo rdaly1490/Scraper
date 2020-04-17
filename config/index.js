@@ -1,6 +1,6 @@
 module.exports = (() => {
   const SCRAPE_DELAY = 5000;
-  const DATE_FORMAT = "MMM D - h:m A";
+  const DATE_FORMAT = "MMM D - h:mm A";
   if (process.env.NODE_ENV === "production") {
     return {
       twilio: {

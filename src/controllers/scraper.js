@@ -2,6 +2,8 @@ const puppeteer = require("puppeteer");
 const ScraperBaseClass = require("../common/scraper-base-class");
 const { compactMap } = require("../common/helpers");
 const { SuccessfulScrape } = require("../models/successful-scrape");
+const { MAX_ERRORS_PER_SITE } = require("../constants");
+const { SocketEventTypes } = require("../enums");
 
 class Scraper {
   constructor(deps) {
@@ -14,13 +16,10 @@ class Scraper {
 
   async startScraping() {
     this.mcp.log("Scraping process started");
-
-    this.mcp.clearErrors();
     await this.scrapeAll();
   }
 
   async scrapeAll() {
-    const scrapeCandidates = this.mcp.scrapeDataSource;
     let browser;
     if (process.env.NODE_ENV === "debug") {
       browser = await puppeteer.launch({ devtools: true });
@@ -28,28 +27,40 @@ class Scraper {
       browser = await puppeteer.launch();
     }
 
-    let successfulScrapes = [];
-    for (const candidate of scrapeCandidates) {
-      this.mcp.log(`Scraping ${candidate.site}`);
-      const results = await this.scrapePage(candidate, browser);
-      if (results.length) {
-        successfulScrapes = [...successfulScrapes, ...results];
-      }
-    }
-
-    this.mcp.addResults(successfulScrapes);
-
-    this.mcp.log(
-      `Current scrape process finished with ${successfulScrapes.length} successful scrapes`
+    const sitesGrouped = this.mcp.scrapeSitesGroupedByStatus;
+    const scrapeCandidates = this.mcp.scrapeDataSource.filter(candidate =>
+      sitesGrouped.functioningSites.includes(candidate.site)
     );
 
-    setTimeout(() => {
-      if (this.mcp.isScraping) {
-        this.scrapeAll();
-      } else {
-        this.mcp.log("Scraping has stopped");
+    this.mcp.emitEvent(SocketEventTypes.siteStatuses, sitesGrouped);
+
+    if (scrapeCandidates.length) {
+      let successfulScrapes = [];
+      for (const candidate of scrapeCandidates) {
+        this.mcp.log(`Scraping ${candidate.site}`);
+        const results = await this.scrapePage(candidate, browser);
+        if (results.length) {
+          successfulScrapes = [...successfulScrapes, ...results];
+        }
       }
-    }, this.mcp.config.SCRAPE_DELAY || 0);
+
+      this.mcp.addResults(successfulScrapes);
+
+      this.mcp.log(
+        `Current scrape process finished with ${successfulScrapes.length} successful scrapes`
+      );
+
+      setTimeout(() => {
+        if (this.mcp.isScraping) {
+          this.scrapeAll();
+        } else {
+          this.mcp.log("Scraping has stopped");
+        }
+      }, this.mcp.config.SCRAPE_DELAY || 0);
+    } else {
+      this.mcp.endScrape();
+      this.mcp.addGenericError("No valid candidates to scrape");
+    }
   }
 
   async scrapePage(candidate, browser) {
