@@ -151,7 +151,6 @@ class MasterControlProgram {
 
   log = message => {
     const socketEventType = SocketEventTypes.log;
-    console.log(`${socketEventType}: ${message}`);
     this.emitEvent(socketEventType, message);
   };
 

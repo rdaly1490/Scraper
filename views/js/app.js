@@ -64,7 +64,6 @@ socket.on("app error", message => {
 });
 
 socket.on("results", results => {
-  console.log("results received");
   results.forEach(result => {
     console.log(`result for ${result.site}`);
     const div = document.createElement("div");
