@@ -48,12 +48,14 @@ class HttpServer {
     const serverStatus = ServerStatus.description(this.status);
     const isScraping = this.mcp.isScraping;
     const scrapeErrors = this.mcp.errorHandler.scrapeErrors
-      .map(this.mcp.errorHandler.formatErrorMessage)
-      .sort((a, b) => a.date - b.date);
+      .sort((a, b) => b.date - a.date)
+      .map(this.mcp.errorHandler.formatErrorMessage);
     const appErrors = this.mcp.errorHandler.appErrors
-      .map(this.mcp.errorHandler.formatErrorMessage)
-      .sort((a, b) => a.date - b.date);
-    const results = this.mcp.formatResultsDate(this.mcp.getResults());
+      .sort((a, b) => b.date - a.date)
+      .map(this.mcp.errorHandler.formatErrorMessage);
+    const results = this.mcp.formatResultsDate(
+      this.mcp.getResults().sort((a, b) => b.date - a.date)
+    );
 
     return {
       errorSites,

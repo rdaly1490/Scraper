@@ -138,7 +138,7 @@ class Scraper {
     };
 
     const targets = Array.from(document.querySelectorAll(candidate.target));
-    window.logError("Test", candidate);
+
     return targets
       .map(target => {
         const isValid = evaluateTargetVersusRules(target, candidate);

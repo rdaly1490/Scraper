@@ -161,7 +161,7 @@ class MasterControlProgram {
       if (acc.hasOwnProperty(error.candidate.site)) {
         acc[error.candidate.site] = acc[error.candidate.site] + 1;
       } else {
-        acc[error.candidate.site] = 0;
+        acc[error.candidate.site] = 1;
       }
       return acc;
     }, {});
@@ -169,7 +169,7 @@ class MasterControlProgram {
     const sitesGrouped = this.scrapeDataSource.reduce(
       (acc, { site }) => {
         if (
-          errorsGrouped[site] <= MAX_ERRORS_PER_SITE ||
+          errorsGrouped[site] < MAX_ERRORS_PER_SITE ||
           !errorsGrouped.hasOwnProperty(site)
         ) {
           acc.functioningSites.push(site);
