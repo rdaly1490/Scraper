@@ -49,10 +49,11 @@ class HttpServer {
     const isScraping = this.mcp.isScraping;
     const scrapeErrors = this.mcp.errorHandler.scrapeErrors
       .map(this.mcp.errorHandler.formatErrorMessage)
-      .sort((a, b) => b.date - a.date);
+      .sort((a, b) => a.date - b.date);
     const appErrors = this.mcp.errorHandler.appErrors
       .map(this.mcp.errorHandler.formatErrorMessage)
-      .sort((a, b) => b.date - a.date);
+      .sort((a, b) => a.date - b.date);
+    const results = this.mcp.formatResultsDate(this.mcp.getResults());
 
     return {
       errorSites,
@@ -60,7 +61,9 @@ class HttpServer {
       serverStatus,
       isScraping,
       scrapeErrors,
-      appErrors
+      appErrors,
+      results,
+      SocketEventTypes
     };
   }
 
@@ -86,6 +89,16 @@ class HttpServer {
         } else {
           this.mcp.endScrape();
         }
+      });
+
+      socket.on(SocketEventTypes.resetAppState, () => {
+        this.mcp.resetAppState();
+        const sitesGrouped = this.mcp.scrapeSitesGroupedByStatus;
+        this.mcp.emitEvent(SocketEventTypes.siteStatuses, sitesGrouped);
+      });
+
+      socket.on(SocketEventTypes.sendTestText, () => {
+        this.mcp.sendTestText();
       });
 
       socket.on("disconnect", () => {

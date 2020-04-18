@@ -33,7 +33,6 @@ h4 {
 
 .list {
   background-color: black;
-  width: 100%;
   height: 200px;
   padding: 20px;
   overflow-y: auto;
@@ -44,7 +43,12 @@ h4 {
   margin: 5px;
 }
 
-.in-stock-alerts.list p {
+.in-stock-alerts.list div p {
+  color: #2ecc71;
+}
+
+.in-stock-alerts.list div a {
+  cursor: pointer;
   color: #2ecc71;
 }
 
@@ -68,4 +72,20 @@ h4 {
 .site-statuses .error-sites span:last-of-type {
   color: #e74c3c;
   margin-left: 5px;
+}
+
+.site-info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-container {
+  font-family: "Ubuntu", sans-serif;
+  position: absolute;
+  top: 25px;
+  right: 25px;
+}
+
+.reset-app-state {
+  margin-right: 15px;
 }

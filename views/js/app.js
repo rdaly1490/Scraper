@@ -2,15 +2,25 @@ const socket = io();
 
 const scrapeErrors = document.querySelector(".scrape-errors");
 const appErrors = document.querySelector(".app-errors");
+const inStockAlerts = document.querySelector(".in-stock-alerts");
 const logs = document.querySelector(".logs");
-const inStockAlerts = document.querySelector("in-stock-alerts");
+const resetAppStateBtn = document.querySelector(".reset-app-state");
+const sendTestTextBtn = document.querySelector(".send-test-text");
+
+resetAppStateBtn.addEventListener("click", () => {
+  socket.emit("reset app state");
+});
+
+sendTestTextBtn.addEventListener("click", () => {
+  socket.emit("send test text");
+});
 
 document.querySelector("input.cb-value").addEventListener("click", function() {
   const functioningSites = document.querySelector(".functioning-sites");
   const numFunctioningSites = functioningSites.childElementCount;
   if (numFunctioningSites === 0) {
     alert(
-      "The app can't find any valid candidates in your provided json list, please update the list or forcefully reset the app state using the clear state button"
+      "The app can't find any valid candidates in your provided json list, please update the list or forcefully reset the app state using the reset state button"
     );
     return;
   }
@@ -45,6 +55,18 @@ socket.on("app error", message => {
   const p = document.createElement("p");
   p.innerHTML = message;
   appErrors.insertBefore(p, appErrors.firstChild);
+});
+
+socket.on("results", results => {
+  console.log("results received");
+  results.forEach(result => {
+    console.log(`result for ${result.site}`);
+    const div = document.createElement("div");
+    div.innerHTML = `<p>${result.date} ${result.site}: ${result.text}</p>
+                     <a href=${result.url}>${result.url}</a>
+                     <p>----------</p>`;
+    inStockAlerts.insertBefore(div, inStockAlerts.firstChild);
+  });
 });
 
 socket.on("site statuses", ({ errorSites, functioningSites }) => {

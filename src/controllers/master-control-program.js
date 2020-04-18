@@ -10,6 +10,8 @@ const { MAX_ERRORS_PER_SITE } = require("../constants");
 
 class MasterControlProgram {
   constructor(options) {
+    Object.assign(this, options);
+
     const mcp = { mcp: this };
     this.errorHandler = new ErrorHandler(mcp);
     this._httpServer = new HttpServer(mcp);
@@ -19,7 +21,8 @@ class MasterControlProgram {
     this.results = [];
     this.isScraping = false;
 
-    Object.assign(this, options);
+    this.addResults = this.addResults.bind(this);
+    this.sendTestText = this.sendTestText.bind(this);
   }
 
   start = () => {
@@ -59,6 +62,10 @@ class MasterControlProgram {
     this.errorHandler.clearErrors();
   };
 
+  getResults = () => {
+    return this.results;
+  };
+
   addScrapeError = (text, candidate) => {
     const error = new ScrapeError(text, candidate);
     this.addError(error);
@@ -85,18 +92,53 @@ class MasterControlProgram {
     this._httpServer.emitSocketEvent(socketEventType, message);
   };
 
-  addResults = results => {
-    const _results = results.filter(this.isValidResult);
-    if (_results.length) {
-      // TODO: call twilio and have remove after successful text was sent
-      this.results.concat(_results);
-    }
+  formatResultsDate = results => {
+    return results.map(result => {
+      return {
+        ...result,
+        date: moment(result.date).format(this.config.DATE_FORMAT)
+      };
+    });
   };
 
+  async addResults(results) {
+    const _results = results.filter(this.isValidResult);
+    if (_results.length) {
+      this.results = [...this.results, ..._results];
+
+      const formattedResults = this.formatResultsDate(_results);
+      this.emitEvent(SocketEventTypes.results, formattedResults);
+
+      await this.twilio.sendTextForResults(formattedResults);
+    }
+  }
+
+  async sendTestText() {
+    await this.twilio.sendTwilioMessage("Test");
+  }
+
   isValidResult = result => {
-    const isUnique = !this.results.find(r => {
-      return r.site === result.site && r.text === result.text;
+    const isDuplicateResult = this.results.find(r => {
+      const resultForSameSiteExists = r.site === result.site;
+      const resultForSameItemExists = r.text === result.text;
+      const resultIsFromSameDay = moment(result.date).isSame(
+        moment(r.date),
+        "day"
+      );
+
+      const isDuplicate =
+        resultForSameSiteExists &&
+        resultForSameItemExists &&
+        resultIsFromSameDay;
+
+      return isDuplicate;
     });
+
+    if (isDuplicateResult) {
+      this.log(`Duplicate result processed for ${result.site}`);
+    }
+
+    const isUnique = !isDuplicateResult;
 
     // add other rules as necessary
     return isUnique;

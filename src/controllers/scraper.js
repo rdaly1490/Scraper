@@ -7,26 +7,36 @@ const { SocketEventTypes } = require("../enums");
 
 class Scraper {
   constructor(deps) {
+    this.browser = null;
+    this.page = null;
+
     this.scrapeAll = this.scrapeAll.bind(this);
     this.scrapePage = this.scrapePage.bind(this);
     this.startScraping = this.startScraping.bind(this);
+    this.setupScrapeEnvironment = this.setupScrapeEnvironment.bind(this);
 
     Object.assign(this, deps);
   }
 
+  async setupScrapeEnvironment() {
+    if (process.env.NODE_ENV === "debug") {
+      this.browser = await puppeteer.launch({ devtools: true });
+    } else {
+      this.browser = await puppeteer.launch();
+    }
+
+    this.page = await this.browser.newPage();
+    await this.page.setDefaultNavigationTimeout(120000);
+    await this.page.exposeFunction("logError", this.mcp.addScrapeError);
+  }
+
   async startScraping() {
-    this.mcp.log("Scraping process started");
+    await this.setupScrapeEnvironment();
     await this.scrapeAll();
   }
 
   async scrapeAll() {
-    let browser;
-    if (process.env.NODE_ENV === "debug") {
-      browser = await puppeteer.launch({ devtools: true });
-    } else {
-      browser = await puppeteer.launch();
-    }
-
+    this.mcp.log("Scraping process started");
     const sitesGrouped = this.mcp.scrapeSitesGroupedByStatus;
     const scrapeCandidates = this.mcp.scrapeDataSource.filter(candidate =>
       sitesGrouped.functioningSites.includes(candidate.site)
@@ -38,7 +48,7 @@ class Scraper {
       let successfulScrapes = [];
       for (const candidate of scrapeCandidates) {
         this.mcp.log(`Scraping ${candidate.site}`);
-        const results = await this.scrapePage(candidate, browser);
+        const results = await this.scrapePage(candidate);
         if (results.length) {
           successfulScrapes = [...successfulScrapes, ...results];
         }
@@ -63,15 +73,27 @@ class Scraper {
     }
   }
 
-  async scrapePage(candidate, browser) {
-    const page = await browser.newPage();
-    await page.setDefaultNavigationTimeout(120000);
-    await page.exposeFunction("logError", this.mcp.addScrapeError);
-    await page.goto(candidate.url);
+  async scrapePage(candidate) {
+    try {
+      await this.page.goto(candidate.url);
+    } catch (e) {
+      this.mcp.addScrapeError(
+        `Was not able to load url: ${candidate.url}`,
+        candidate
+      );
+    }
 
-    const matches = await page.evaluate(this.puppeteerEvaluatePage, candidate);
+    const matches = await this.page.evaluate(
+      this.puppeteerEvaluatePage,
+      candidate
+    );
     return matches.map(match => {
-      return new SuccessfulScrape(match.site, match.url, match.text);
+      return new SuccessfulScrape(
+        match.site,
+        match.url,
+        match.text,
+        new Date()
+      );
     });
   }
 
