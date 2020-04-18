@@ -37,6 +37,7 @@ Add your own scrapes-data-source.json file to the project's root.  scrapes-test-
 ]
 ```
 
+```
 "site": This should be unqique (i.e. Office Depot, Staples, etc.)
 "url": string,
 "target": querySelector pattern for the container you want to target
@@ -53,4 +54,4 @@ Add your own scrapes-data-source.json file to the project's root.  scrapes-test-
     "child": querySelector pattern for child of above target that the rule should perform the test on,
     "existence": check if the child element exists
 }
-
+```
