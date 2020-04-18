@@ -5,15 +5,19 @@ const appErrors = document.querySelector(".app-errors");
 const inStockAlerts = document.querySelector(".in-stock-alerts");
 const logs = document.querySelector(".logs");
 const resetAppStateBtn = document.querySelector(".reset-app-state");
-const sendTestTextBtn = document.querySelector(".send-test-text");
+const sendTestActionControllerBtn = document.querySelector(
+  ".send-test-controller"
+);
 
 resetAppStateBtn.addEventListener("click", () => {
   socket.emit("reset app state");
 });
 
-sendTestTextBtn.addEventListener("click", () => {
-  socket.emit("send test text");
-});
+if (window.nodeEnv !== "production") {
+  sendTestActionControllerBtn.addEventListener("click", () => {
+    socket.emit("send test text");
+  });
+}
 
 document.querySelector("input.cb-value").addEventListener("click", function() {
   const functioningSites = document.querySelector(".functioning-sites");
@@ -35,6 +39,8 @@ document.querySelector("input.cb-value").addEventListener("click", function() {
     socket.emit("toggle scrape", false);
   }
 });
+
+// TODO: pass down SocketEventTypes enum
 
 socket.on("log", message => {
   console.log(message);
@@ -77,10 +83,10 @@ socket.on("site statuses", ({ errorSites, functioningSites }) => {
   functioningSitesDiv.innerHTML = "";
   errorSitesDiv.innerHTML = "";
 
-  const goodStatusSpan = document.createElement("span");
-  goodStatusSpan.innerHTML = "Good";
   functioningSites.forEach(site => {
     const div = document.createElement("div");
+    const goodStatusSpan = document.createElement("span");
+    goodStatusSpan.innerHTML = "Good";
     const siteSpan = document.createElement("span");
     siteSpan.innerHTML = site + ":";
     div.appendChild(siteSpan);
@@ -88,10 +94,10 @@ socket.on("site statuses", ({ errorSites, functioningSites }) => {
     functioningSitesDiv.appendChild(div);
   });
 
-  const errorStatusSpan = document.createElement("span");
-  errorStatusSpan.innerHTML = "Error";
   errorSites.forEach(site => {
     const div = document.createElement("div");
+    const errorStatusSpan = document.createElement("span");
+    errorStatusSpan.innerHTML = "Error";
     const siteSpan = document.createElement("span");
     siteSpan.innerHTML = site + ":";
     div.appendChild(siteSpan);

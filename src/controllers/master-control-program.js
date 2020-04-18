@@ -1,6 +1,5 @@
 const moment = require("moment");
 const HttpServer = require("./http-server");
-const Twilio = require("./twilio");
 const Scraper = require("./scraper");
 const ErrorHandler = require("./errors");
 
@@ -15,14 +14,16 @@ class MasterControlProgram {
     const mcp = { mcp: this };
     this.errorHandler = new ErrorHandler(mcp);
     this._httpServer = new HttpServer(mcp);
-    this.twilio = new Twilio(mcp);
     this.scraper = new Scraper(mcp);
+
+    const ActionController = require(`./${options.config.ACTION_CONTROLLER}`);
+    this.actionController = new ActionController(mcp);
 
     this.results = [];
     this.isScraping = false;
 
     this.addResults = this.addResults.bind(this);
-    this.sendTestText = this.sendTestText.bind(this);
+    this.testActionController = this.testActionController.bind(this);
   }
 
   start = () => {
@@ -109,12 +110,12 @@ class MasterControlProgram {
       const formattedResults = this.formatResultsDate(_results);
       this.emitEvent(SocketEventTypes.results, formattedResults);
 
-      await this.twilio.sendTextForResults(formattedResults);
+      await this.actionController.onResultsAdded(formattedResults);
     }
   }
 
-  async sendTestText() {
-    await this.twilio.sendTwilioMessage("Test");
+  async testActionController() {
+    await this.actionController.onTestController();
   }
 
   isValidResult = result => {

@@ -10,7 +10,8 @@ html
       h1 The server is #{serverStatus.toLowerCase()}
       div(class='btn-container')
         button(class='btn draw-border reset-app-state') Reset App State
-        button(class='btn draw-border send-test-text') Send Test Text
+        if nodeEnv !== 'production'
+          button(class='btn draw-border send-test-controller') Test Action Controller
       div(class='toggle-btn-container')
         h3 Scrape Sites
         div(class=isScraping ? 'toggle-btn active' : 'toggle-btn')
@@ -49,5 +50,6 @@ html
 
     script(src='/socket.io/socket.io.js')
     script.
-      // window.SocketEventTypes = SocketEventTypes
+      //- SocketEventTypes=#{SocketEventTypes}
+      nodeEnv="#{nodeEnv}";
     script(src='js/app.js')

@@ -65,7 +65,8 @@ class HttpServer {
       scrapeErrors,
       appErrors,
       results,
-      SocketEventTypes
+      SocketEventTypes,
+      nodeEnv: process.env.NODE_ENV
     };
   }
 
@@ -100,7 +101,7 @@ class HttpServer {
       });
 
       socket.on(SocketEventTypes.sendTestText, () => {
-        this.mcp.sendTestText();
+        this.mcp.testActionController();
       });
 
       socket.on("disconnect", () => {

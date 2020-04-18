@@ -2,7 +2,7 @@ const twilio = require("twilio");
 
 class Twilio {
   constructor(deps) {
-    const { twilio: twilioConfig } = deps.mcp.config;
+    const { actionControllerConfig: twilioConfig } = deps.mcp.config;
     if (twilioConfig) {
       this.keys = twilioConfig;
       this.twilioClient = new twilio(
@@ -13,6 +13,8 @@ class Twilio {
 
     this.sendTwilioMessage = this.sendTwilioMessage.bind(this);
     this.sendTextForResults = this.sendTextForResults.bind(this);
+    this.onResultsAdded = this.onResultsAdded.bind(this);
+    this.onTestController = this.onTestController.bind(this);
 
     Object.assign(this, deps);
   }
@@ -36,6 +38,14 @@ class Twilio {
 
     return message;
   };
+
+  async onResultsAdded(results) {
+    await this.sendTextForResults(results);
+  }
+
+  async onTestController() {
+    await this.sendTwilioMessage("Test");
+  }
 
   async sendTextForResults(results) {
     const message = this.getMsgFromResults(results);

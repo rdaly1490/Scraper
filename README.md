@@ -1,9 +1,21 @@
 Short and sweet for now.
 
-Need to add your own keys.js file inside /config in the shape of:
+The scrape results can be modified to do whatever you want with them through the use of any generic "Action controller" of your making.  For the sake of example, this repo includes an action controller that uses twilio to send texts upon successful scrapes.
 
+The protocol for any action controller is
 ```
-{
+protocol ActionController {
+    async onResultsAdded = () => void
+    async onTestController = () => void
+}
+```
+Action Controllers also get passed an instance of master control program to take advantage of error logging methods, config vars, etc.
+
+If you'd like to change the action controller to your own custom one, create your own controller file in the controllers directory, update the const `const ACTION_CONTROLLER = "twilio";` in /config/index.js to the name of your file, and add your own specific config variables in a file called action-controller-config.js.
+
+If you'd like to use the twilio controller example, the shape of action-controller-config.js is:
+```
+module.exports = {
   TWILIO_PHONE_NUMBER,
   MY_PHONE_NUMBER,
   ACCOUNT_SID,
@@ -11,7 +23,15 @@ Need to add your own keys.js file inside /config in the shape of:
 }
 ```
 
-Add your own scrapes-data-source.json file to the project's root.  scrapes-test-data-source.json shows as an example.  The shape of the file is
+Otherwise, just have your custom config settings follow 
+```
+module.exports = {
+  ...CONFIG
+}
+```
+
+
+Add your own scrapes-data-source.json file to the project's root to run the app in production, otherwise scrapes-test-data-source.json runs in other node environments and shows as an example of how the production file should be shaped.  The shape of the file is:
 
 ```
 [
