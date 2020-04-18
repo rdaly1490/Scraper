@@ -99,9 +99,10 @@ class Scraper {
 
   puppeteerEvaluatePage = candidate => {
     const checkRegexRule = (rule, child) => {
-      var regex = new RegExp(rule.regex.pattern, rule.regex.flags);
+      const regex = new RegExp(rule.regex.pattern, rule.regex.flags);
       const matchesRegex = regex.test(child.text);
-      return matchesRegex;
+      const textShouldExist = candidate.textShouldExist || true;
+      return matchesRegex === textShouldExist;
     };
 
     const evaluateTargetVersusRules = (target, candidate) => {

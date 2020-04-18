@@ -34,27 +34,30 @@ module.exports = {
 Add your own scrapes-data-source.json file to the project's root to run the app in production, otherwise scrapes-test-data-source.json runs in other node environments and shows as an example of how the production file should be shaped.  The shape of the file is:
 
 ```
+-- File Shape --
+
 [
-  {
-    "site": string,
-    "url": string,
-    "target": string,target
-    "itemDescriptionTarget": string,
-    "rules": [
-      {
-        "child": ".desc_text .med_txt",
-        "regex"?: {
-          "pattern": "lysol.*wipes",
-          "flags": "gi"
-        }
-      },
-      {
-        "child": ".oos_label",
-        "existence"?: boolean
-      }
-    ]
-  }
+    {
+        "site": string,
+        "url": string,
+        "target": string,target
+        "itemDescriptionTarget": string,
+        "rules": Array<RegexRule | ExistenceRule>
+    }
 ]
+
+-- Types Definitions For Above --
+
+RegexRule {
+    "pattern": string,
+    "flags": "gi",
+    "textShouldExist": boolean
+}
+
+ExistenceRule {
+    "child": string,
+    "existence"?: boolean
+}
 ```
 
 ```
@@ -62,14 +65,21 @@ Add your own scrapes-data-source.json file to the project's root to run the app 
 "url": string,
 "target": querySelector pattern for the container you want to target
 "itemDescriptionTarget": querySelector pattern for child of above target that has the items description text 
-"rules": can be many rules of the folowing 2 shapes:
+"rules": can be as many rules of the folowing 2 shapes as needed:
+
+ -- RegexRule --
+
 {
     "child": querySelector pattern for child of above target that the rule should perform the test on,
         "regex": {
             "pattern": regex pattern to match text on,
-            "flags": flags for the regex pattern
+            "flags": flags for the regex pattern,
+            "textShouldExist": determine if a regex match should yield a successful scrape or not, defaults to true
         }
-},
+}
+
+-- ExistenceRule --
+
 {
     "child": querySelector pattern for child of above target that the rule should perform the test on,
     "existence": check if the child element exists

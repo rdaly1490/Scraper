@@ -9,15 +9,15 @@ const sendTestActionControllerBtn = document.querySelector(
   ".send-test-controller"
 );
 
-resetAppStateBtn.addEventListener("click", () => {
-  socket.emit("reset app state");
-});
-
 if (window.nodeEnv !== "production") {
   sendTestActionControllerBtn.addEventListener("click", () => {
     socket.emit("send test text");
   });
 }
+
+resetAppStateBtn.addEventListener("click", () => {
+  socket.emit("reset app state");
+});
 
 document.querySelector("input.cb-value").addEventListener("click", function() {
   const functioningSites = document.querySelector(".functioning-sites");

@@ -9,7 +9,8 @@
         "child": ".desc_text .med_txt",
         "regex": {
           "pattern": "lysol.*wipes",
-          "flags": "gi"
+          "flags": "gi",
+          "textShouldExist": true
         }
       },
       {
