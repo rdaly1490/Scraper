@@ -1,5 +1,4 @@
 const puppeteer = require("puppeteer");
-const ScraperBaseClass = require("../common/scraper-base-class");
 const { compactMap } = require("../common/helpers");
 const { SuccessfulScrape } = require("../models/successful-scrape");
 const { MAX_ERRORS_PER_SITE } = require("../constants");
@@ -22,7 +21,7 @@ class Scraper {
     if (process.env.NODE_ENV === "debug") {
       this.browser = await puppeteer.launch({ devtools: true });
     } else {
-      this.browser = await puppeteer.launch();
+      this.browser = await puppeteer.launch({ headless: false });
     }
 
     this.page = await this.browser.newPage();
@@ -87,6 +86,7 @@ class Scraper {
       this.puppeteerEvaluatePage,
       candidate
     );
+
     return matches.map(match => {
       return new SuccessfulScrape(
         match.site,

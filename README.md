@@ -48,6 +48,8 @@ Add your own scrapes-data-source.json file to the project's root to run the app 
 
 -- Types Definitions For Above --
 
+There should always be a child element when using this rule
+
 RegexRule {
     "pattern": string,
     "flags": "gi",

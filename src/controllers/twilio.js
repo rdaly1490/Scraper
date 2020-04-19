@@ -28,8 +28,8 @@ class Twilio {
       ----------
       
       `;
-
-      return msgFragment;
+      acc += msgFragment;
+      return acc;
     }, "");
 
     const message = `
