@@ -74,7 +74,7 @@ socket.on("log", message => {
   const p = document.createElement("p");
   const _message = (p.innerHTML = JSON.stringify(message).slice(1, -1));
   logs.insertBefore(p, logs.firstChild);
-  if (logs.childElementCount > 200) {
+  if (logs.childElementCount > 500) {
     logs.removeChild(logs.lastChild);
   }
 });

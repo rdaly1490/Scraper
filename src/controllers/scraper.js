@@ -1,5 +1,4 @@
-const puppeteer = require("puppeteer-extra");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+const puppeteer = require("puppeteer");
 const { compactMap } = require("../common/helpers");
 const { SuccessfulScrape } = require("../models/successful-scrape");
 const { MAX_ERRORS_PER_SITE } = require("../constants");
@@ -7,8 +6,6 @@ const { SocketEventTypes } = require("../enums");
 
 class Scraper {
   constructor(deps) {
-    puppeteer.use(StealthPlugin());
-
     this.browser = null;
     this.page = null;
 
@@ -34,6 +31,9 @@ class Scraper {
     await this.page.setDefaultNavigationTimeout(120000);
     await this.page.exposeFunction("logError", this.mcp.addScrapeError);
     await this.page.exposeFunction("log", this.mcp.log);
+    await this.page.setUserAgent(
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
+    );
     await this.page.setExtraHTTPHeaders({
       "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8"
     });
@@ -61,6 +61,7 @@ class Scraper {
         if (results.length) {
           successfulScrapes = [...successfulScrapes, ...results];
         }
+        this.mcp.log("---------------");
       }
 
       this.mcp.addResults(successfulScrapes);
@@ -68,6 +69,7 @@ class Scraper {
       this.mcp.log(
         `Current scrape process finished with ${successfulScrapes.length} successful scrapes`
       );
+      this.mcp.log("--------------");
 
       setTimeout(() => {
         if (this.mcp.isScraping) {
@@ -129,7 +131,6 @@ class Scraper {
       const regex = new RegExp(rule.regex.pattern, rule.regex.flags);
       const matchesRegex = regex.test(getTextFromChildNode(child));
       const textShouldExist = candidate.textShouldExist || true;
-      debugger;
       return matchesRegex === textShouldExist;
     };
 
@@ -141,12 +142,6 @@ class Scraper {
         if (rule.hasOwnProperty("regex")) {
           if (child) {
             const matchesRegex = checkRegexRule(rule, child);
-            // window.log(
-            //   `Regex rule number ${index +
-            //     1} for ${candidate.site} has ${matchesRegex
-            //     ? "passed"
-            //     : "failed"}`
-            // );
             isValid.push(matchesRegex);
           } else {
             window.logError(
@@ -174,6 +169,11 @@ class Scraper {
 
     const targets = Array.from(document.querySelectorAll(candidate.target));
 
+    if (targets.length === 0) {
+      window.logError(`No targets found for ${candidate.site}`, candidate);
+    }
+
+    window.log(`Evaluating ${targets.length} targets for ${candidate.site}`);
     return targets
       .map(target => {
         const isValid = evaluateTargetVersusRules(target, candidate);

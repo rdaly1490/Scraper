@@ -74,6 +74,20 @@ h4 {
   margin-left: 5px;
 }
 
+.functioning-sites {
+  padding: 10px 20px 10px 0;
+  border-right: 2px solid darkgray;
+}
+
+.error-sites {
+  padding: 10px 0 10px 20px;
+}
+
+.functioning-sites div,
+.error-sites div {
+  margin-bottom: 5px;
+}
+
 .site-info {
   display: flex;
   justify-content: space-between;

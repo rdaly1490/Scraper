@@ -50,7 +50,9 @@ class MasterControlProgram {
 
   endScrape = () => {
     this.setScraping(false);
-    this.log("Scraping process will end after the current scrape finishes");
+    this.log(
+      " -- Scraping process will end after the current scrape finishes --"
+    );
   };
 
   clearData = () => {
