@@ -166,5 +166,26 @@
         "existence": false
       }
     ]
+  },
+  {
+    "site": "Walgreens - Lysol Spray",
+    "url":
+      "https://www.walgreens.com/search/results.jsp?Ntt=lysol%20spray&webExc=true",
+    "target": ".wag-product-card-details",
+    "itemDescriptionTarget": ".wag-prod-title",
+    "rules": [
+      {
+        "child": ".wag-prod-title",
+        "regex": {
+          "pattern": "lysol.*disinfectant.*spray",
+          "flags": "gi",
+          "textShouldExist": true
+        }
+      },
+      {
+        "child": ".wag-channal-availabilitytxt",
+        "existence": false
+      }
+    ]
   }
 ]
