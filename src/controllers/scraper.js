@@ -61,7 +61,7 @@ class Scraper {
         if (results.length) {
           successfulScrapes = [...successfulScrapes, ...results];
         }
-        this.mcp.log("---------------");
+        this.mcp.log("--------------");
       }
 
       this.mcp.addResults(successfulScrapes);
@@ -70,6 +70,9 @@ class Scraper {
         `Current scrape process finished with ${successfulScrapes.length} successful scrapes`
       );
       this.mcp.log("--------------");
+      this.mcp.log(
+        `Next scrape in ${(+this.mcp.config.SCRAPE_DELAY || 0) / 1000} seconds`
+      );
 
       setTimeout(() => {
         if (this.mcp.isScraping) {
@@ -77,7 +80,7 @@ class Scraper {
         } else {
           this.mcp.log("Scraping has stopped");
         }
-      }, this.mcp.config.SCRAPE_DELAY || 0);
+      }, +this.mcp.config.SCRAPE_DELAY || 0);
     } else {
       this.mcp.endScrape();
       this.mcp.addGenericError("No valid candidates to scrape");
