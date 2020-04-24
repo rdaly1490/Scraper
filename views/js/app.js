@@ -9,35 +9,58 @@ const sendTestActionControllerBtn = document.querySelector(
   ".send-test-controller"
 );
 
+const passwordCheck = async cb => {
+  if (window.nodeEnv !== "production") {
+    cb();
+    return;
+  }
+
+  let isValid = true;
+  const pw = prompt("What's the password");
+  const response = await fetch(`/check-pw/${pw}`);
+  const data = await response.json();
+  if (data.isValid) {
+    cb();
+  } else {
+    alert("Invalid password");
+  }
+};
+
 if (window.nodeEnv !== "production") {
   sendTestActionControllerBtn.addEventListener("click", () => {
-    socket.emit("send test text");
+    passwordCheck(() => {
+      socket.emit("send test text");
+    });
   });
 }
 
 resetAppStateBtn.addEventListener("click", () => {
-  socket.emit("reset app state");
+  passwordCheck(() => {
+    socket.emit("reset app state");
+  });
 });
 
 document.querySelector("input.cb-value").addEventListener("click", function() {
-  const functioningSites = document.querySelector(".functioning-sites");
-  const numFunctioningSites = functioningSites.childElementCount;
-  if (numFunctioningSites === 0) {
-    alert(
-      "The app can't find any valid candidates in your provided json list, please update the list or forcefully reset the app state using the reset state button"
-    );
-    return;
-  }
-  const toggleBtn = document.querySelector(".toggle-btn");
-  const isChecked = document.querySelector("input.cb-value").checked;
+  passwordCheck(() => {
+    const functioningSites = document.querySelector(".functioning-sites");
+    const numFunctioningSites = functioningSites.childElementCount;
+    if (numFunctioningSites === 0) {
+      alert(
+        "The app can't find any valid candidates in your provided json list, please update the list or forcefully reset the app state using the reset state button"
+      );
+      return;
+    }
+    const toggleBtn = document.querySelector(".toggle-btn");
+    const isChecked = document.querySelector("input.cb-value").checked;
 
-  if (isChecked) {
-    toggleBtn.classList.add("active");
-    socket.emit("toggle scrape", true);
-  } else {
-    toggleBtn.classList.remove("active");
-    socket.emit("toggle scrape", false);
-  }
+    if (isChecked) {
+      toggleBtn.classList.add("active");
+      socket.emit("toggle scrape", true);
+    } else {
+      toggleBtn.classList.remove("active");
+      socket.emit("toggle scrape", false);
+    }
+  });
 });
 
 // TODO: pass down SocketEventTypes enum

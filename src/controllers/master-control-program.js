@@ -16,8 +16,11 @@ class MasterControlProgram {
     this._httpServer = new HttpServer(mcp);
     this.scraper = new Scraper(mcp);
 
-    const ActionController = require(`./${options.config.ACTION_CONTROLLER}`);
-    this.actionController = new ActionController(mcp);
+    this.actionController = null;
+    if (options.config.ACTION_CONTROLLER) {
+      const ActionController = require(`./${options.config.ACTION_CONTROLLER}`);
+      this.actionController = new ActionController(mcp);
+    }
 
     this.results = [];
     this.isScraping = false;
@@ -110,12 +113,16 @@ class MasterControlProgram {
       const formattedResults = this.formatResultsDate(_results);
       this.emitEvent(SocketEventTypes.results, formattedResults);
 
-      await this.actionController.onResultsAdded(formattedResults);
+      if (this.actionController) {
+        await this.actionController.onResultsAdded(formattedResults);
+      }
     }
   }
 
   async testActionController() {
-    await this.actionController.onTestController();
+    if (this.actionController) {
+      await this.actionController.onTestController();
+    }
   }
 
   isValidResult = result => {

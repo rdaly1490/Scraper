@@ -71,10 +71,15 @@ class HttpServer {
   }
 
   registerRoutes = () => {
-    //TODO: load any existing errors or results from mcp state
     this.app.get("/", (req, res) => {
       console.log(this.siteData);
       return res.render("index", this.siteData);
+    });
+    this.app.get("/check-pw/:pw", (req, res) => {
+      const response = JSON.stringify({
+        isValid: req.params.pw === this.mcp.config.PASSWORD
+      });
+      res.send(200, response);
     });
   };
 

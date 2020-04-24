@@ -27,6 +27,7 @@ class Scraper {
     this.page = await this.browser.newPage();
     await this.page.setDefaultNavigationTimeout(120000);
     await this.page.exposeFunction("logError", this.mcp.addScrapeError);
+    await this.page.exposeFunction("log", this.mcp.log);
   }
 
   async startScraping() {
@@ -98,10 +99,28 @@ class Scraper {
   }
 
   puppeteerEvaluatePage = candidate => {
+    const isNotThere = value => {
+      if (value === null || value === undefined) {
+        return null;
+      } else {
+        return value;
+      }
+    };
+
+    const getTextFromChildNode = child => {
+      return (
+        isNotThere(child.text) ||
+        isNotThere(child.textContent) ||
+        isNotThere(child.innerText) ||
+        isNotThere(child.innerHTML)
+      );
+    };
+
     const checkRegexRule = (rule, child) => {
       const regex = new RegExp(rule.regex.pattern, rule.regex.flags);
-      const matchesRegex = regex.test(child.text);
+      const matchesRegex = regex.test(getTextFromChildNode(child));
       const textShouldExist = candidate.textShouldExist || true;
+      debugger;
       return matchesRegex === textShouldExist;
     };
 
@@ -113,6 +132,12 @@ class Scraper {
         if (rule.hasOwnProperty("regex")) {
           if (child) {
             const matchesRegex = checkRegexRule(rule, child);
+            // window.log(
+            //   `Regex rule number ${index +
+            //     1} for ${candidate.site} has ${matchesRegex
+            //     ? "passed"
+            //     : "failed"}`
+            // );
             isValid.push(matchesRegex);
           } else {
             window.logError(
@@ -149,7 +174,7 @@ class Scraper {
             return {
               site: candidate.site,
               url: candidate.url,
-              text: result.text
+              text: getTextFromChildNode(result)
             };
           } else {
             window.logError(

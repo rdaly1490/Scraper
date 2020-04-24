@@ -13,7 +13,8 @@ module.exports = (() => {
       },
       SCRAPE_DELAY: process.env.SCRAPE_DELAY || SCRAPE_DELAY,
       DATE_FORMAT: process.env.DATE_FORMAT || DATE_FORMAT,
-      ACTION_CONTROLLER: process.env.ACTION_CONTROLLER || ACTION_CONTROLLER
+      ACTION_CONTROLLER: process.env.ACTION_CONTROLLER || ACTION_CONTROLLER,
+      PASSWORD: process.env.PASSWORD
     };
   } else {
     const actionControllerConfig = require("./action-controller-config");
