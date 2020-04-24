@@ -21,7 +21,10 @@ class Scraper {
     if (process.env.NODE_ENV === "debug") {
       this.browser = await puppeteer.launch({ devtools: true });
     } else {
-      this.browser = await puppeteer.launch({ headless: false });
+      this.browser = await puppeteer.launch({
+        headless: false,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"]
+      });
     }
 
     this.page = await this.browser.newPage();
