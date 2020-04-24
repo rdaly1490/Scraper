@@ -1,4 +1,5 @@
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-extra");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { compactMap } = require("../common/helpers");
 const { SuccessfulScrape } = require("../models/successful-scrape");
 const { MAX_ERRORS_PER_SITE } = require("../constants");
@@ -6,6 +7,8 @@ const { SocketEventTypes } = require("../enums");
 
 class Scraper {
   constructor(deps) {
+    puppeteer.use(StealthPlugin());
+
     this.browser = null;
     this.page = null;
 
@@ -31,6 +34,9 @@ class Scraper {
     await this.page.setDefaultNavigationTimeout(120000);
     await this.page.exposeFunction("logError", this.mcp.addScrapeError);
     await this.page.exposeFunction("log", this.mcp.log);
+    await this.page.setExtraHTTPHeaders({
+      "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8"
+    });
   }
 
   async startScraping() {

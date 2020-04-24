@@ -15,8 +15,12 @@ const passwordCheck = async cb => {
     return;
   }
 
-  let isValid = true;
   const pw = prompt("What's the password");
+  if (pw === null) {
+    cb();
+    return;
+  }
+
   const response = await fetch(`/check-pw/${pw}`);
   const data = await response.json();
   if (data.isValid) {
@@ -70,6 +74,9 @@ socket.on("log", message => {
   const p = document.createElement("p");
   const _message = (p.innerHTML = JSON.stringify(message).slice(1, -1));
   logs.insertBefore(p, logs.firstChild);
+  if (logs.childElementCount > 200) {
+    logs.removeChild(logs.lastChild);
+  }
 });
 
 socket.on("scrape error", message => {

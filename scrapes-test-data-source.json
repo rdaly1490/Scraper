@@ -1,21 +1,22 @@
 [
   {
-    "site": "Walgreens - Lysol Wipes",
+    "site": "Staples - Lysol Spray",
     "url":
-      "https://www.walgreens.com/search/results.jsp?Ntt=lysol%20wipes&webExc=true",
-    "target": ".wag-product-card-details",
-    "itemDescriptionTarget": ".wag-prod-title",
+      "https://www.staples.com/lysol+spray/directory_lysol%2520spray?deptFid=Department_3A_22All-Purpose!Cleaners!_26!Degreasers_22",
+    "target": ".standard-type__product_tile",
+    "itemDescriptionTarget": ".standard-type__product_title",
     "rules": [
       {
-        "child": ".wag-prod-title",
+        "child": ".standard-type__product_title",
         "regex": {
-          "pattern": "lysol.*wipes",
+          "pattern": "lysol.*disinfectant.*spray",
           "flags": "gi",
           "textShouldExist": true
         }
       },
       {
-        "child": ".wag-channal-availabilitytxt",
+        "child":
+          ".notification__notification.uiStyles__background_alert.uiStyles__text_dark_gray",
         "existence": true
       }
     ]
