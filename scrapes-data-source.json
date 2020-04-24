@@ -1,0 +1,170 @@
+[
+  {
+    "site": "Office Depot - Lysol Wipes",
+    "url": "https://www.officedepot.com/catalog/search.do?Ntt=lysol+wipes",
+    "target": ".products.searchV2.v3_buttons",
+    "itemDescriptionTarget": ".desc_text .med_txt",
+    "rules": [
+      {
+        "child": ".desc_text .med_txt",
+        "regex": {
+          "pattern": "lysol.*wipes",
+          "flags": "gi",
+          "textShouldExist": true
+        }
+      },
+      {
+        "child": ".oos_label",
+        "existence": false
+      }
+    ]
+  },
+  {
+    "site": "Office Depot - Lysol Spray",
+    "url": "https://www.officedepot.com/catalog/search.do?Ntt=lysol+spray",
+    "target": ".products.searchV2.v3_buttons",
+    "itemDescriptionTarget": ".desc_text .med_txt",
+    "rules": [
+      {
+        "child": ".desc_text .med_txt",
+        "regex": {
+          "pattern": "lysol.*disinfectant.*spray",
+          "flags": "gi",
+          "textShouldExist": true
+        }
+      },
+      {
+        "child": ".oos_label",
+        "existence": false
+      }
+    ]
+  },
+  {
+    "site": "Staples - Lysol Spray",
+    "url":
+      "https://www.staples.com/lysol+spray/directory_lysol%2520spray?deptFid=Department_3A_22All-Purpose!Cleaners!_26!Degreasers_22",
+    "target": ".standard-type__product_tile",
+    "itemDescriptionTarget": ".standard-type__product_title",
+    "rules": [
+      {
+        "child": ".standard-type__product_title",
+        "regex": {
+          "pattern": "lysol.*disinfectant.*spray",
+          "flags": "gi",
+          "textShouldExist": true
+        }
+      },
+      {
+        "child":
+          ".notification__notification.uiStyles__background_alert.uiStyles__text_dark_gray",
+        "existence": false
+      }
+    ]
+  },
+  {
+    "site": "Staples - Lysol Wipes",
+    "url":
+      "https://www.staples.com/lysol+wipes/directory_lysol%2520wipes?deptFid=Department_3A_22Disinfectant!Wipes_22",
+    "target": ".standard-type__product_tile",
+    "itemDescriptionTarget": ".standard-type__product_title",
+    "rules": [
+      {
+        "child": ".standard-type__product_title",
+        "regex": {
+          "pattern": "lysol.*disinfectant.*spray",
+          "flags": "gi",
+          "textShouldExist": true
+        }
+      },
+      {
+        "child":
+          ".notification__notification.uiStyles__background_alert.uiStyles__text_dark_gray",
+        "existence": false
+      }
+    ]
+  },
+  {
+    "site": "CVS - Lysol Wipes",
+    "url":
+      "https://www.cvs.com/search/?cp=%5B%7B%22key%22%3A%22source%22%2C%22value%22%3A%22sayt%22%7D%5D&searchTerm=lysol%20wipes",
+    "target": ".r-tzz3ar",
+    "itemDescriptionTarget": "section:first-child div",
+    "rules": [
+      {
+        "child": "section:first-child div",
+        "regex": {
+          "pattern": "lysol.*wipes",
+          "flags": "gi",
+          "textShouldExist": true
+        }
+      },
+      {
+        "child": ".r-v857uc",
+        "existence": false
+      }
+    ]
+  },
+  {
+    "site": "CVS - Lysol Spray",
+    "url":
+      "https://www.cvs.com/search/?cp=%5B%7B%22key%22%3A%22source%22%2C%22value%22%3A%22sayt%22%7D%5D&searchTerm=lysol%20spray",
+    "target": ".r-tzz3ar",
+    "itemDescriptionTarget": "section:first-child div",
+    "rules": [
+      {
+        "child": "section:first-child div",
+        "regex": {
+          "pattern": "lysol.*disinfectant.*spray",
+          "flags": "gi",
+          "textShouldExist": true
+        }
+      },
+      {
+        "child": ".r-v857uc",
+        "existence": false
+      }
+    ]
+  },
+  {
+    "site": "Walgreens - Lysol Wipes",
+    "url":
+      "https://www.walgreens.com/search/results.jsp?Ntt=lysol%20wipes&webExc=true",
+    "target": ".wag-product-card-details",
+    "itemDescriptionTarget": ".wag-prod-title",
+    "rules": [
+      {
+        "child": ".wag-prod-title",
+        "regex": {
+          "pattern": "lysol.*wipes",
+          "flags": "gi",
+          "textShouldExist": true
+        }
+      },
+      {
+        "child": ".wag-channal-availabilitytxt",
+        "existence": false
+      }
+    ]
+  },
+  {
+    "site": "Walgreens - Lysol Spray",
+    "url":
+      "https://www.walgreens.com/search/results.jsp?Ntt=lysol%20spray&webExc=true",
+    "target": ".wag-product-card-details",
+    "itemDescriptionTarget": ".wag-prod-title",
+    "rules": [
+      {
+        "child": ".wag-prod-title",
+        "regex": {
+          "pattern": "lysol.*disinfectant.*spray",
+          "flags": "gi",
+          "textShouldExist": true
+        }
+      },
+      {
+        "child": ".wag-channal-availabilitytxt",
+        "existence": false
+      }
+    ]
+  }
+]
