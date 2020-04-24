@@ -79,7 +79,7 @@ class HttpServer {
       const response = JSON.stringify({
         isValid: req.params.pw === this.mcp.config.PASSWORD
       });
-      res.send(200, response);
+      res.status(200).send(response);
     });
   };
 
