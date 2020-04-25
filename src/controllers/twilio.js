@@ -32,9 +32,13 @@ class Twilio {
       return acc;
     }, "");
 
-    const message = `
+    let message = `
     ${messageHeader}
     ${messageBody}`;
+
+    if (message.length >= 1600) {
+      message = message.slice(0, 800) + "... (See logs for more details)";
+    }
 
     return message;
   };

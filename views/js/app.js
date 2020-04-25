@@ -16,10 +16,7 @@ const passwordCheck = async cb => {
   }
 
   const pw = prompt("What's the password");
-  if (pw === null) {
-    cb();
-    return;
-  }
+  if (pw === null) return;
 
   const response = await fetch(`/check-pw/${pw}`);
   const data = await response.json();

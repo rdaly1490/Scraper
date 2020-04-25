@@ -37,11 +37,11 @@ html
             p #{val.date} #{val.site}: #{val.text}
             a(href=val.url) #{val.url}
             p ----------
-      h3 Scrape Errors Go Here
+      h3 Scrape Errors
       div(class='scrape-errors list')
         each val in scrapeErrors
           p=val
-      h3 General App Errors Go Here
+      h3 General App Errors
       div(class='app-errors list')
         each val in appErrors
           p=val
