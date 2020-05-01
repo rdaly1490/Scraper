@@ -31,6 +31,9 @@ class MasterControlProgram {
 
   start = () => {
     this._httpServer.startServer();
+    if (this.config.AUTO_START) {
+      this.startScrape();
+    }
   };
 
   setScraping = status => {

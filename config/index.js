@@ -2,6 +2,7 @@ module.exports = (() => {
   const SCRAPE_DELAY = 5000;
   const DATE_FORMAT = "MMM D - h:mm A";
   const ACTION_CONTROLLER = "twilio";
+  const AUTO_START = false;
 
   if (process.env.NODE_ENV === "production") {
     return {
@@ -14,7 +15,8 @@ module.exports = (() => {
       SCRAPE_DELAY: process.env.SCRAPE_DELAY || SCRAPE_DELAY,
       DATE_FORMAT: process.env.DATE_FORMAT || DATE_FORMAT,
       ACTION_CONTROLLER: process.env.ACTION_CONTROLLER || ACTION_CONTROLLER,
-      PASSWORD: process.env.PASSWORD
+      PASSWORD: process.env.PASSWORD,
+      ACTION_CONTROLLER: process.env.AUTO_START || AUTO_START
     };
   } else {
     const actionControllerConfig = require("./action-controller-config");
@@ -22,7 +24,8 @@ module.exports = (() => {
       actionControllerConfig,
       SCRAPE_DELAY,
       DATE_FORMAT,
-      ACTION_CONTROLLER
+      ACTION_CONTROLLER,
+      AUTO_START
     };
   }
 })();
