@@ -87,3 +87,12 @@ ExistenceRule {
     "existence": check if the child element exists
 }
 ```
+
+Configurable Environment Variables
+```
+SCRAPE_DELAY: time in between scrapes, measured in milliseconds.  Defaults to 5000 (5 seconds),
+DATE_FORMAT: the format the dates will show up in the UI.  Uses moment JS date format.  Default value is "MMM D - h:mm A".
+ACTION_CONTROLLER: the filename of the controller you'd like to acknowledge successful scrape results.  Defaults to "twilio".
+PASSWORD: A password for when you deploy the app to a production env.  This prevents other unauthorized users from toggling scrapes on or off.
+AUTO_START: flag for auto starting the scrape process if the server restarts (for example, Heroku restarts hobby dynos once a day).
+```
