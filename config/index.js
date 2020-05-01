@@ -16,7 +16,7 @@ module.exports = (() => {
       DATE_FORMAT: process.env.DATE_FORMAT || DATE_FORMAT,
       ACTION_CONTROLLER: process.env.ACTION_CONTROLLER || ACTION_CONTROLLER,
       PASSWORD: process.env.PASSWORD,
-      ACTION_CONTROLLER: process.env.AUTO_START || AUTO_START
+      AUTO_START: process.env.AUTO_START || AUTO_START
     };
   } else {
     const actionControllerConfig = require("./action-controller-config");
