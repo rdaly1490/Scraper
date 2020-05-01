@@ -36,7 +36,7 @@ class Twilio {
     ${messageHeader}
     ${messageBody}`;
 
-    if (message.length >= 1600) {
+    if (message.length >= 800) {
       message = message.slice(0, 800) + "... (See logs for more details)";
     }
 
